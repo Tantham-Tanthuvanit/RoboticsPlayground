@@ -1,49 +1,45 @@
 #include "drivers/imu.h"
 #include <cmath>
 
-// Standard I2C address for MPU6050 / similar IMUs
-constexpr uint8_t IMU_I2C_ADDR = 0x68;
-
 IMUDriver::IMUDriver() {}
 
 bool IMUDriver::init() {
-    Wire.begin(); // ESP32 default pins: SDA = GPIO 21, SCL = GPIO 22
+    Wire.begin(IMU_SDA, IMU_SCL); // Explicitly sets the ESP32-S3 I2C pins[cite: 1]
+    
+    // The BNO086 I2C address is usually 0x4A, or sometimes 0x4B
+    if (!bno08x_.begin_I2C(0x4A, &Wire)) {
+        if (!bno08x_.begin_I2C(0x4B, &Wire)) {
+            return false; // Sensor not found
+        }
+    }
 
-    // Wake up the IMU (Power Management register 1)
-    Wire.beginTransmission(IMU_I2C_ADDR);
-    Wire.write(0x6B); 
-    Wire.write(0x00); 
-    uint8_t error = Wire.endTransmission();
-
-    return (error == 0); // Returns true if sensor acknowledged the I2C transmission
+    // Ask the BNO086 to calculate and report the Rotation Vector every 10,000 microseconds (10ms / 100Hz)
+    if (!bno08x_.enableReport(SH2_ROTATION_VECTOR, 10000)) {
+        return false;
+    }
+    
+    return true;
 }
 
 void IMUDriver::update(float dt) {
     if (dt <= 0.0f) return;
 
-    // 1. Request raw accelerometer data from register 0x3B (6 bytes: X, Y, Z high/low)
-    Wire.beginTransmission(IMU_I2C_ADDR);
-    Wire.write(0x3B);
-    Wire.endTransmission(false);
-    Wire.requestFrom(IMU_I2C_ADDR, static_cast<uint8_t>(6), true);
 
-    if (Wire.available() >= 6) {
-        int16_t ax = (Wire.read() << 8) | Wire.read();
-        int16_t ay = (Wire.read() << 8) | Wire.read();
-        int16_t az = (Wire.read() << 8) | Wire.read();
+    // Check if the BNO086 has a new calculated packet ready
+    if (bno08x_.getSensorEvent(&sensorValue_)) {
+        if (sensorValue_.sensorId == SH2_ROTATION_VECTOR) {
+            
+            // Extract the Quaternions
+            float r = sensorValue_.un.rotationVector.real;
+            float i = sensorValue_.un.rotationVector.i;
+            float j = sensorValue_.un.rotationVector.j;
+            float k = sensorValue_.un.rotationVector.k;
 
-        // Convert raw bits to g's (assuming default ±2g sensitivity scale: 16384 LSB/g)
-        float accel_x = static_cast<float>(ax) / 16384.0f;
-        float accel_y = static_cast<float>(ay) / 16384.0f;
-        float accel_z = static_cast<float>(az) / 16384.0f;
 
-        // 2. Compute Roll and Pitch from gravity vector using trigonometry
-        roll_deg_  = std::atan2(accel_y, std::sqrt(accel_x * accel_x + accel_z * accel_z)) * (180.0f / M_PI);
-        pitch_deg_ = std::atan2(-accel_x, std::sqrt(accel_y * accel_y + accel_z * accel_z)) * (180.0f / M_PI);
+            // Convert Quaternions directly into Euler Angles (Yaw, Pitch, Roll) in degrees
+            yaw_deg_   = std::atan2(2.0f * (r * k + i * j), 1.0f - 2.0f * (j * j + k * k)) * (180.0f / M_PI);
+            pitch_deg_ = std::asin(2.0f * (r * j - k * i)) * (180.0f / M_PI);
+            roll_deg_  = std::atan2(2.0f * (r * i + j * k), 1.0f - 2.0f * (i * i + j * j)) * (180.0f / M_PI);
+        }
     }
-
-    // 3. For Yaw, you integrate gyroscope Z-axis rate over dt. 
-    // (Placeholder integration example; replace with your gyro Z reading if available)
-    // float gyro_z_deg_s = ...; 
-    // yaw_deg_ += gyro_z_deg_s * dt;
 }
