@@ -13,7 +13,7 @@ void setup() {
     lidar.init();
 
     // command motor to spin
-    lidar.setMotorSpeed(180);
+    lidar.setMotorSpeed(0);
 }
 
 void loop() {

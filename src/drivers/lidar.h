@@ -25,7 +25,7 @@ class LidarSensor {
         ParseState parse_state = WAITING_HEADER;
 
         std::vector<LidarPoint> current_points;
-        bool new_scan_read = false;
+        bool new_scan_ready = false;
 
         static constexpr size_t PACKET_SIZE = 47;
         uint8_t buffer[PACKET_SIZE];

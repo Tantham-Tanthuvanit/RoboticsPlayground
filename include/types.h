@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 struct WheelSpeeds {
     float left;     // rads/s
