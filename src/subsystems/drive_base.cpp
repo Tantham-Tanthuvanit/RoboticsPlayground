@@ -32,9 +32,9 @@ void DriveBase::update(float dt) {
 }
 
 float DriveBase::getLeftVelocity() const {
-
+    return target_left_rad_s;
 }
 
 float DriveBase::getRightVelocity() const {
-
+    return target_right_rad_s;
 }

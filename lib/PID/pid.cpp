@@ -14,7 +14,7 @@ PIDController::PIDController(float kp_, float ki_, float kd_, float out_min_, fl
     last_error = 0.0f;
 }
 
-float PIDController::compute(float setpoint, float measurement, float dt, float feedforward = 0.0f) {
+float PIDController::compute(float setpoint, float measurement, float dt, float feedforward) {
     if (dt <= 0.0f) return 0.0f;
 
     // calculations for porportional and integral term
@@ -42,7 +42,7 @@ float PIDController::compute(float setpoint, float measurement, float dt, float 
 }
 
 float PIDController::computeAngle(float target_rad, float current_rad, float dt) {
-
+    return -1.0f;
 }
 
 void PIDController::reset() {

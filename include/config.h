@@ -10,33 +10,33 @@ constexpr int IMU_SCL = 9;
 // ----------------------------------------------------------------
 // < DRIVE MOTOR CONFIG >
 // Left motor pins
-constexpr int PIN_MOTOR_L_PWM;
-constexpr int PIN_MOTOR_L_DIR;
-constexpr int MOTOR_L_PWM_CHANNEL;
+constexpr int PIN_MOTOR_L_PWM = 0;
+constexpr int PIN_MOTOR_L_DIR = 0;
+constexpr int MOTOR_L_PWM_CHANNEL = 0;
 
 // Right motor pins
-constexpr int PIN_MOTOR_R_PWM;
-constexpr int PIN_MOTOR_R_DIR;
-constexpr int MOTOR_R_PWM_CHANNEL;
+constexpr int PIN_MOTOR_R_PWM = 0;
+constexpr int PIN_MOTOR_R_DIR = 0;
+constexpr int MOTOR_R_PWM_CHANNEL = 0;
 
 // ----------------------------------------------------------------
 // < ENCODER SETTINGS >
 
-constexpr int TICKS_PER_REV;
+constexpr int TICKS_PER_REV = 0;
 
 // Left encoder pins
-constexpr int PIN_ENCODER_L_A;
-constexpr int PIN_ENCODER_L_B;
+constexpr int PIN_ENCODER_L_A = 0;
+constexpr int PIN_ENCODER_L_B = 0;
 
 // Right encoder pins
-constexpr int PIN_ENCODER_R_A;
-constexpr int PIN_ENCODER_R_B;
+constexpr int PIN_ENCODER_R_A = 0;
+constexpr int PIN_ENCODER_R_B = 0;
 
 // ----------------------------------------------------------------
 // < PID SETTINGS >
-constexpr float KP;
-constexpr float KI;
-constexpr float KD;
+constexpr float KP = 0.1f;
+constexpr float KI = 0.1f;
+constexpr float KD = 0.1f;
 
 // ----------------------------------------------------------------
 // < LIDAR SETTINGS >
