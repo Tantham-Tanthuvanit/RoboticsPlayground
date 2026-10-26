@@ -40,5 +40,5 @@ constexpr float KD;
 
 // ----------------------------------------------------------------
 // < LIDAR SETTINGS >
-constexpr int LIDAR_RX_PIN = 44;
+constexpr int LIDAR_RX_PIN = 18;
 constexpr int LIDAR_MOTOR_PWM_PIN = 4;
