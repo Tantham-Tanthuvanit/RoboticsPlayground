@@ -5,6 +5,8 @@
 // iinit lidar with the pins in config.h and on hardware serial 1
 LidarSensor lidar(LIDAR_RX_PIN, LIDAR_MOTOR_PWM_PIN, 1);
 
+unsigned long last_post_time = 0;
+
 void setup() {
     Serial.begin(115200);
     delay(1000);
@@ -21,18 +23,33 @@ void loop() {
     lidar.update();
 
     // check for a new packet
-    if (lidar.hasNewScan()) {
-        const auto& points = lidar.getLatestPoints();
-        
-        Serial.printf("Notor Speed: %.1f RPM | Points in packet: %u\n",
-                        lidar.getLatestSpeedRPM(),
-                        static_cast<unsigned int>(points.size()));
+    if (lidar.hasNewScan())
+    {
+        unsigned long current_time = millis();
 
-        for (const auto& pt : points) {
-            Serial.printf("     Angle: %6.2f° | Distance: %4u mm | Confidence: %3u\n",
-                            pt.angle_deg,
-                            pt.distance_mm,
-                            pt.intensity);
+        // send telemetry every 3 sec
+        if (current_time - last_post_time >= post_interval_ms) {
+            last_post_time = current_time;
+
+            const auto &points = lidar.getLatestPoints();
+
+            Serial.print("{\"rpm\": ");
+            Serial.print(lidar.getLatestSpeedRPM(), 1);
+            Serial.print(", \"points\": [");
+
+            for (size_t i = 0; i < points.size(); ++i) {
+                Serial.print("{\"a\":");
+                Serial.print(points[i].angle_deg, 1);
+                Serial.print(",\"d\":");
+                Serial.print(points[i].distance_mm);
+                Serial.print(",\"c\":");
+                Serial.print(points[i].intensity);
+                Serial.print("}");
+                if (i < points.size() - 1)
+                    Serial.print(",");
+            }
+            Serial.println("]}");
         }
     }
+
 }

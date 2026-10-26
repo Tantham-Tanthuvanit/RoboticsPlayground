@@ -42,3 +42,6 @@ constexpr float KD = 0.1f;
 // < LIDAR SETTINGS >
 constexpr int LIDAR_RX_PIN = 18;
 constexpr int LIDAR_MOTOR_PWM_PIN = 4;
+unsigned long last_post_time = 0;
+const unsigned long post_interval_ms = 3000;
+
