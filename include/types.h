@@ -10,3 +10,9 @@ struct Pose2D {
     float y;        // m
     float theta;    // radians
 };
+
+struct LidarPoint {
+    float angle_deg;
+    uint16_t distance_mm;
+    uint8_t intensity;
+};

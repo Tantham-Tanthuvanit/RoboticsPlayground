@@ -9,11 +9,12 @@ class DriveBase {
     DriveBase();
     void init();
 
-    void setTargetVelocity(float vx, float omega);
+    void setTargetVelocities(float left_target_rad_s, float right_target_rad_s);
 
     void update(float dt);
 
-    Pose2D getPose() const;
+    float getLeftVelocity() const;
+    float getRightVelocity() const;
 
     private:
     MotorDriver left_motor;
@@ -21,4 +22,10 @@ class DriveBase {
     Encoder left_encoder;
     Encoder right_encoder;
     
+    PIDController left_pid;
+    PIDController right_pid;
+
+    float target_left_rad_s = 0.0f;
+    float target_right_rad_s = 0.0f;
+
 };
