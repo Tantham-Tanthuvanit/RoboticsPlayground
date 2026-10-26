@@ -56,6 +56,10 @@ void LidarSensor::parsePacket() {
     // float start_angle = (buffer_[4] | (buffer_[5] << 8)) / 100.0f;
     // float end_angle   = (buffer_[42] | (buffer_[43] << 8)) / 100.0f;
 
+    // extract speed
+    uint16_t raw_speed = buffer[2] | (buffer[3] << 8);
+    currentRPM = raw_speed / 60.0f;
+
     // bytes 4-5 start angle
     float start_angle = static_cast<float>(buffer[4] | (buffer[5] << 8)) / 100.0f;
 
@@ -95,4 +99,8 @@ bool LidarSensor::hasNewScan() const {
 
 const std::vector<LidarPoint>& LidarSensor::getLatestPoints() const {
     return current_points;
+}
+
+float LidarSensor::getLatestSpeedRPM() const {
+    return currentRPM;
 }

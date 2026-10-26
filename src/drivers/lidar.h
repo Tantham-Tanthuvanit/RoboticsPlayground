@@ -15,6 +15,7 @@ class LidarSensor {
 
         bool hasNewScan() const;
         const std::vector<LidarPoint>& getLatestPoints() const;
+        float getLatestSpeedRPM() const;
         
     private:
         int rx_pin;
@@ -30,6 +31,8 @@ class LidarSensor {
         static constexpr size_t PACKET_SIZE = 47;
         uint8_t buffer[PACKET_SIZE];
         size_t bytes_read = 0;
+
+        float currentRPM;
 
         void parsePacket();
 
