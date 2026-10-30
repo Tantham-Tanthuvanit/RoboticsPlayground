@@ -2,15 +2,19 @@
 #include <cmath>
 
 static void IRAM_ATTR encoderISR(void* arg) {
-    static_cast<Encoder*>(arg)->handleInterrupt();
+    if (arg) {
+        static_cast<Encoder*>(arg)->handleInterrupt();
+    }
 }
 
-Encoder::Encoder(uint8 pin_a_, uint8 pin_b_, int32_t ticks_per_rev_, bool invert_) {
-    pin_a = pin_a_;
-    pin_b = pin_b_;
-    ticks_per_rev = ticks_per_rev_;
-    invert_ = invert;
-}
+Encoder::Encoder(uint8_t pin_a_, uint8_t pin_b_, int32_t ticks_per_rev_, bool invert_)
+    : pin_a(pin_a_),
+      pin_b(pin_b_),
+      ticks_per_rev(ticks_per_rev_),
+      invert(invert_),
+      ticks(0),
+      prev_ticks(0),
+      velocity_rad_s(0.0f) {}
 
 void Encoder::init() {
     pinMode(pin_a, INPUT_PULLUP);
@@ -31,7 +35,7 @@ void IRAM_ATTR Encoder::handleInterrupt() {
 }
 
 void Encoder::update(float dt) {
-    if (dt <= 0.0f) return;
+    if (dt <= 0.0f || ticks_per_rev <= 0) return;
 
     // grab tick count
     noInterrupts();
@@ -46,7 +50,7 @@ void Encoder::update(float dt) {
     float raw_rad_s = (static_cast<float>(delta_ticks) / ticks_per_rev) * (2.0f * M_PI) / dt;
 
     // apply light low pass filter to smooth out data
-    constexpr float ALPHA = 0.7; // constexpr forces variable to be evaluated at compile time
+    constexpr float ALPHA = 0.7f;
     velocity_rad_s = (ALPHA * raw_rad_s) + ((1.0f - ALPHA) * velocity_rad_s); // apply low pass filter
     /**
     * low pass filter formula

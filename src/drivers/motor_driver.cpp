@@ -7,7 +7,6 @@ MotorDriver::MotorDriver(int pwm_pin_, int dir_pin_, int pwm_channel_) {
 }
 
 void MotorDriver::init() {
-    pinMode(pwm_pin, INPUT);
     pinMode(dir_pin, OUTPUT);
 
     // pin, freq, resolution

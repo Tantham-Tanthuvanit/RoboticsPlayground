@@ -15,8 +15,8 @@ constexpr int PIN_MOTOR_L_DIR = 0;
 constexpr int MOTOR_L_PWM_CHANNEL = 0;
 
 // Right motor pins
-constexpr int PIN_MOTOR_R_PWM = 0;
-constexpr int PIN_MOTOR_R_DIR = 0;
+constexpr int PIN_MOTOR_R_PWM = 21;
+constexpr int PIN_MOTOR_R_DIR = 20;
 constexpr int MOTOR_R_PWM_CHANNEL = 0;
 
 // ----------------------------------------------------------------

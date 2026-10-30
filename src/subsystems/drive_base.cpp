@@ -6,7 +6,7 @@
 DriveBase::DriveBase()
     :   left_motor(PIN_MOTOR_L_PWM, PIN_MOTOR_L_DIR, MOTOR_L_PWM_CHANNEL),
         right_motor(PIN_MOTOR_R_PWM, PIN_MOTOR_R_DIR, MOTOR_R_PWM_CHANNEL),
-        left_encoder(PIN_ENCODER_L_A, PIN_ENCODER_R_A, TICKS_PER_REV, false),
+        left_encoder(PIN_ENCODER_L_A, PIN_ENCODER_L_B, TICKS_PER_REV, false),
         right_encoder(PIN_ENCODER_R_A, PIN_ENCODER_R_B, TICKS_PER_REV, false),
         left_pid(KP, KI, KD, -1.0f, 1.0f),
         right_pid(KP, KI, KD, -1.0f, 1.0f)
