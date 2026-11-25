@@ -43,7 +43,18 @@ def main():
     pygame.joystick.init()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    if sys.platform == "win32":
+        # Disable WSAECONNRESET on Windows UDP sockets when an ICMP port unreachable is received
+        try:
+            SIO_UDP_CONNRESET = 0x9800000C
+            sock.ioctl(SIO_UDP_CONNRESET, False)
+        except Exception:
+            pass
+
     dest_addr = (args.ip, args.port)
+
+    # Ignore mouse motion to prevent filling SDL event queue
+    pygame.event.set_blocked(pygame.MOUSEMOTION)
 
     # Check for joysticks
     joystick = None
@@ -92,15 +103,20 @@ def main():
     try:
         while True:
             t_start = time.time()
-            pygame.event.pump()
+
+            # Drain event queue to avoid SDL event queue overflow (128 event limit)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    raise KeyboardInterrupt
+                elif event.type == pygame.KEYDOWN and use_keyboard:
+                    if event.key in (pygame.K_ESCAPE, pygame.K_q):
+                        raise KeyboardInterrupt
 
             throttle = 0.0
             steering = 0.0
 
             if use_keyboard:
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_ESCAPE] or keys[pygame.K_q]:
-                    break
 
                 if keys[pygame.K_w] or keys[pygame.K_UP]:
                     throttle += 1.0
@@ -144,7 +160,10 @@ def main():
 
             # Send UDP packet: 2 floats (throttle, steering)
             packet = struct.pack("ff", float(throttle), float(steering))
-            sock.sendto(packet, dest_addr)
+            try:
+                sock.sendto(packet, dest_addr)
+            except OSError:
+                pass
 
             # Live status line
             sys.stdout.write(f"\rThrottle: {throttle:+5.2f} | Steering: {steering:+5.2f} | Target: {dest_addr[0]}:{dest_addr[1]}   ")

@@ -34,4 +34,6 @@ private:
 
     unsigned long last_packet_time;
     bool connected;
+    float current_throttle;
+    float current_steering;
 };
